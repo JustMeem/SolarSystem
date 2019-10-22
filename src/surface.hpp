@@ -12,7 +12,7 @@ class surface
 private:
     sf::RenderWindow &window;
     std::vector<planet> &planets;
-    float x{}, y{}, z{};
+    float x{}, y{};
     float scale{1};
 public:
     surface(sf::RenderWindow &w, std::vector<planet> &p):window{w}, planets{p}{}
@@ -37,15 +37,14 @@ public:
     void rescale(float mult){
         scale *= mult;
     }
-    void move(float dx, float dy, float dz){
+    void move(float dx, float dy){
         x += dx;
         y += dy;
-        z += dz;
     }
     void draw(){
         std::sort(planets.begin(), planets.end());
         for(auto &planet : planets){
-            planet.draw(this);
+            planet.draw(*this);
         }
     }
     ~surface(){}
