@@ -6,26 +6,47 @@
 
 
 
+
 class planet
 {
 private:
     planet &parent;
-    sf::CircleShape image;
+    sf::CircleShape image{};
     gmtl::Matrix33f matrix = gmtl::Matrix33f();
     gmtl::Matrix<float, 3, 1> radvec = gmtl::Matrix<float, 3, 1>();
-    float angle, avelocity, radius;
-    const float e, a, s;
+    float angle, avelocity, radius, s;
+    const float e, a;
     bool calculated{false};
 public:
-    planet(){
+    planet(planet &p, float diameter, sf::Color &color, float perhelion, float aphelion, float a, float e, float period,
+            float inclination, float asclong, float periapsarg, float angle = 0):parent{p}, e{e}, a{a}, angle{angle}{
+        image.setRadius(diameter / 2);
+        image.setFillColor(color);
         float temp[9] = {1, 0, 0,
                         0, 1, 0,
                         0, 0, 1};
         matrix.set(temp);
+        s = (perhelion + aphelion)/2 * (2 * M_PI / (period * 3650));
+        inclination *= M_PI/180;
+        asclong *= M_PI/180;
+        periapsarg *= M_PI/180;
+        rotateX(inclination);
+        rotateY(asclong);
+        rotateZ(periapsarg);
+        radius = (a * (1 - e * e))/(1 + e * std::cos(angle));
+        recalc();
     }
 
     bool isCalculated(){
         return calculated;
+    }
+
+    void scaleSpeed(float multiplyer){
+        s *= multiplyer;
+    }
+
+    void reverse(){
+        s = -s;
     }
 
     void step(){
@@ -52,9 +73,10 @@ public:
     }
 
     void draw(surface &s){
-        image.setRadius(image.getRadius * s.scale);
-        image.setPosition(sf::Vector2f((radvec(1, 1) + s.x) * s.scale, (radvec(2, 1)+ s.y) * s.scale));
-        s.window.draw(image);
+        float scale = s.getScale();
+        image.setRadius(image.getRadius * scale);
+        image.setPosition(sf::Vector2f((radvec(1, 1) + s.getX()) * scale, (radvec(2, 1)+ s.getY()) * scale));
+        s.getWindow().draw(image);
     }
 
     void rotateX(float a){
@@ -63,7 +85,7 @@ public:
                       0, -std::sin(a), std::cos(a)};
         gmtl::Matrix33f temp = gmtl::Matrix33f();
         temp.set(m);
-        matrix = matrix * temp;
+        matrix = temp * matrix;
     }
     void rotateY(float a){
         float m[9] = {std::cos(a), 0, -std::sin(a),
@@ -71,7 +93,7 @@ public:
                       std::sin(a), 0, std::cos(a)};
         gmtl::Matrix33f temp = gmtl::Matrix33f();
         temp.set(m);
-        matrix = matrix * temp;
+        matrix = temp * matrix;
     }
     void rotateZ(float a){
         float m[9] = {std::cos(a), std::sin(a), 0,
@@ -79,7 +101,7 @@ public:
                       0, 0, 1};
         gmtl::Matrix33f temp = gmtl::Matrix33f();
         temp.set(m);
-        matrix = matrix * temp;
+        matrix = temp * matrix;
     }
     ~planet();
 };

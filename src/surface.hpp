@@ -1,8 +1,9 @@
 #pragma once
+#include "planet.hpp"
 #include <gmtl/gmtl.h>
 #include <gmtl/Matrix.h>
 #include <sfml/Graphics.hpp>
-#include "planet.hpp"
+
 #include <cmath>
 #include <vector>
 
@@ -17,7 +18,19 @@ private:
 public:
     surface(sf::RenderWindow &w, std::vector<planet> &p):window{w}, planets{p}{}
 
-    
+    float getX(){
+        return x;
+    }
+    float getY(){
+        return y;
+    }
+    float getScale(){
+        return scale;
+    }
+    sf::RenderWindow &getWindow(){
+        return window;
+    }
+
 
     void rotateX(float a){
         for (auto &planet : planets){
