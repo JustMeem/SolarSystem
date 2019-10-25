@@ -56,6 +56,7 @@ public:
     }
     void draw(){
         std::sort(planets.begin(), planets.end());
+        window.clear();
         for(auto &planet : planets){
             planet.draw(*this);
         }
